@@ -1,33 +1,36 @@
-.SUFFIXES: .c .o
 
-.c.o:
-	$(CC) $(CFLAGS) -c $<
+CC ?= gcc
 
-all: scimark4 
+OBJ := \
+	build/FFT.o \
+	build/kernel.o \
+	build/Stopwatch.o \
+	build/Random.o \
+	build/SOR.o \
+	build/SparseCompRow.o \
+	build/array.o \
+	build/MonteCarlo.o \
+	build/LU.o \
+	build/scimark4.o
 
+CFLAGS := -O3 -march=native -flto -fwhole-program -ffast-math -lm -Isrc/include
 
-CC = icc
-CFLAGS = -O3 -fno-alias -parallel -par-num-threads=4
+.SUFFIXES: .o .c
+.PHONY: build
 
+build:
+	mkdir -p build
+	$(MAKE) scimark
 
-CC = gcc
-CC = cc
-LDFLAGS = 
-CFLAGS = -O3 -funroll-all-loops -mtune=prescott
-CFLAGS = -O3 -funroll-all-loops   -Wall -pedantic -flto
-CFLAGS = -O3 -funroll-all-loops   -Wall -pedantic -flto 
-CFLAGS = -O3 -funroll-loops   -Wall -pedantic -flto 
-CFLAGS = -O3 -funroll-all-loops   -Wall -pedantic  -ansi
-CFLAGS = -O3 -funroll-loops   -Wall -pedantic  -ansi
+build/%.o: src/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-OBJS = FFT.o kernel.o Stopwatch.o Random.o SOR.o SparseCompRow.o \
-	array.o MonteCarlo.o LU.o scimark4.o
-
-scimark4 :  $(OBJS)
-	$(CC) $(CFLAGS) -o scimark4  $(OBJS) $(LDFLAGS) -lm 
+scimark: $(OBJ)
+	$(CC) $(CFLAGS) -o scimark $(OBJ)
 
 clean:
-	rm $(OBJS) 
+	rm -Rf build
 
-wipe:
-	rm $(OBJS) scimark4
+wipe: clean
+	rm scimark
+
