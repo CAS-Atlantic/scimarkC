@@ -74,8 +74,9 @@ int main(int argc, char* argv[]) {
   kernel_measureMonteCarlo(itter, R, &res[3], &sum[3], &estimate_time[3]);
   printf("MonteCarlo:     Mflops: %8.2f  \n", res[3]);
 
-  kernel_measureSparseMatMult(Sparse_size_M, Sparse_size_nz, itter * 1000, R,
-                              &res[4], &sum[4], &estimate_time[4]);
+  kernel_measureSparseMatMult(Sparse_size_M, Sparse_size_nz,
+                              itter * LG_SPARSE_SIZE_M, R, &res[4], &sum[4],
+                              &estimate_time[4]);
   printf("Sparse matmult  Mflops: %8.2f    (N=%d, nz=%d)  \n", res[4],
          Sparse_size_M, Sparse_size_nz);
 
