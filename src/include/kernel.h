@@ -1,20 +1,41 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-void kernel_measureFFT( unsigned int FFT_size, double min_time, Random R, 
-      double *res, double *sum, unsigned long *num_cyles);
+#include "Random.h"
 
-void kernel_measureSOR( unsigned int SOR_size, double min_time, Random R,
-      double *res, double *sum, unsigned long *num_cyles);
+void kernel_measureFFT(unsigned int FFT_size,
+                       int itter,
+                       Random R,
+                       double* res,
+                       double* sum,
+                       double* estimate_time);
 
-void kernel_measureMonteCarlo( double min_time, Random R,
-      double *res, double *sum, unsigned long *num_cyles);
+void kernel_measureSOR(unsigned int SOR_size,
+                       int itter,
+                       Random R,
+                       double* res,
+                       double* sum,
+                       double* estimate_time);
+
+void kernel_measureMonteCarlo(int itter,
+                              Random R,
+                              double* res,
+                              double* sum,
+                              double* estimate_time);
 
 void kernel_measureSparseMatMult(unsigned int Sparse_size_N,
-    unsigned int Sparse_size_nz, double min_time, Random R,
-      double *res, double *sum, unsigned long *num_cyles);
+                                 unsigned int Sparse_size_nz,
+                                 int itter,
+                                 Random R,
+                                 double* res,
+                                 double* sum,
+                                 double* estimate_time);
 
-void kernel_measureLU( unsigned int LU_size, double min_time, Random R,
-      double *res, double *sum, unsigned long *num_cyles);
+void kernel_measureLU(unsigned int LU_size,
+                      int itter,
+                      Random R,
+                      double* res,
+                      double* sum,
+                      double* estimate_time);
 
 #endif

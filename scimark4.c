@@ -20,7 +20,7 @@ unsigned int ilog2(unsigned int N) {
 int main(int argc, char* argv[]) {
   /* default to the (small) cache-contained version */
 
-  double min_time = RESOLUTION_DEFAULT;
+  int itter = RESOLUTION_DEFAULT;
 
   int FFT_size = FFT_SIZE;
   int SOR_size = SOR_SIZE;
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
   /* run the benchmark */
   double res[6] = {0.0};
   double sum[6] = {0.0}; /* checksum */
-  unsigned long num_cycles[6] = {0.0};
+  double estimate_time[6] = {0.0};
   Random R = new_Random_seed(RANDOM_SEED);
 
   if (argc > 1) {
@@ -54,32 +54,32 @@ int main(int argc, char* argv[]) {
 
     if (current_arg < argc) {
       if (atof(argv[current_arg]) > 0.0)
-        min_time = atof(argv[current_arg]);
+        itter = atoi(argv[current_arg]);
     }
   }
 
   print_banner();
-  printf("Using %10.2f seconds min time per kenel.", min_time);
+  printf("Using %d itter per kenel.", itter);
   printf("\n\n");
 
   /* print out results  */
 
-  kernel_measureFFT(FFT_size, min_time, R, &res[1], &sum[1], &num_cycles[1]);
+  kernel_measureFFT(FFT_size, itter, R, &res[1], &sum[1], &estimate_time[1]);
   printf("FFT             Mflops: %8.2f    (N=%d) \n", res[1], FFT_size);
 
-  kernel_measureSOR(SOR_size, min_time, R, &res[2], &sum[2], &num_cycles[2]);
+  kernel_measureSOR(SOR_size, itter, R, &res[2], &sum[2], &estimate_time[2]);
   printf("SOR             Mflops: %8.2f    (%d x %d) \n", res[2], SOR_size,
          SOR_size);
 
-  kernel_measureMonteCarlo(min_time, R, &res[3], &sum[3], &num_cycles[3]);
+  kernel_measureMonteCarlo(itter, R, &res[3], &sum[3], &estimate_time[3]);
   printf("MonteCarlo:     Mflops: %8.2f  \n", res[3]);
 
-  kernel_measureSparseMatMult(Sparse_size_M, Sparse_size_nz, min_time, R,
-                              &res[4], &sum[4], &num_cycles[4]);
+  kernel_measureSparseMatMult(Sparse_size_M, Sparse_size_nz, itter * 1000, R,
+                              &res[4], &sum[4], &estimate_time[4]);
   printf("Sparse matmult  Mflops: %8.2f    (N=%d, nz=%d)  \n", res[4],
          Sparse_size_M, Sparse_size_nz);
 
-  kernel_measureLU(LU_size, min_time, R, &res[5], &sum[5], &num_cycles[5]);
+  kernel_measureLU(LU_size, itter, R, &res[5], &sum[5], &estimate_time[5]);
   printf("LU              Mflops: %8.2f    (M=%d, N=%d) \n", res[5], LU_size,
          LU_size);
 
@@ -92,11 +92,11 @@ int main(int argc, char* argv[]) {
   printf("************************************\n");
   printf("\n");
 
-  printf("FFT reps:              %ld\n", num_cycles[1]);
-  printf("SOR reps:              %ld\n", num_cycles[2]);
-  printf("Montel Carlo reps:     %ld\n", num_cycles[3]);
-  printf("Sparse MatMult repss:  %ld\n", num_cycles[4]);
-  printf("LU reps:               %ld\n", num_cycles[5]);
+  printf("FFT reps:              %0.2f\n", estimate_time[1]);
+  printf("SOR reps:              %0.2f\n", estimate_time[2]);
+  printf("Montel Carlo reps:     %0.2f\n", estimate_time[3]);
+  printf("Sparse MatMult repss:  %0.2f\n", estimate_time[4]);
+  printf("LU reps:               %0.2f\n", estimate_time[5]);
   printf("\n");
   printf("checksum:              %20.16e\n", sum[0]);
 
