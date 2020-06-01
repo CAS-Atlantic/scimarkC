@@ -11,12 +11,7 @@
 #include "Stopwatch.h"
 #include "array.h"
 
-void kernel_measureFFT(unsigned int N,
-                       int itter,
-                       Random R,
-                       double* res,
-                       double* sum_,
-                       double* estimate_time) {
+double kernel_measureFFT(unsigned int N, int itter, Random R) {
   /* initialize FFT data as complex (N real/img pairs) */
 
   int twiceN = 2 * N;
@@ -24,7 +19,6 @@ void kernel_measureFFT(unsigned int N,
   Stopwatch Q = new_Stopwatch();
   int i = 0;
   double result = 0.0;
-  double sum = 0.0;
 
   Stopwatch_start(Q);
   for (i = 0; i < itter; i++) {
@@ -34,82 +28,46 @@ void kernel_measureFFT(unsigned int N,
   Stopwatch_stop(Q);
   /* approx Mflops */
 
-  *estimate_time = Stopwatch_read(Q);
-  result = FFT_num_flops(N) * itter / *estimate_time * 1.0e-6;
+  result = Stopwatch_read(Q);
   Stopwatch_delete(Q);
-
-  for (i = 0; i < twiceN; i++) {
-    sum += x[i];
-  }
-  sum /= twiceN;
-
   free(x);
-
-  *sum_ = sum;
-  *res = result;
+  return result;
 }
 
-void kernel_measureSOR(unsigned int N,
-                       int itter,
-                       Random R,
-                       double* res,
-                       double* sum_,
-                       double* estimate_time) {
+double kernel_measureSOR(unsigned int N, int itter, Random R) {
   double** G = RandomMatrix(N, N, R);
   double result = 0.0;
-  double sum = 0.0;
   unsigned int i = 0, j = 0;
 
   Stopwatch Q = new_Stopwatch();
   Stopwatch_start(Q);
   SOR_execute(N, N, 1.25, G, itter);
   Stopwatch_stop(Q);
-
-  /* approx Mflops */
-
-  *estimate_time = Stopwatch_read(Q);
-  result = SOR_num_flops(N, N, itter) / *estimate_time * 1.0e-6;
-
-  for (i = 0; i < N; i++)
-    for (j = 0; j < N; j++)
-      sum += G[i][j];
-  sum /= (N * N);
-
+  result = Stopwatch_read(Q);
   Array2D_double_delete(N, N, G);
-  *res = result;
-  *sum_ = sum;
-
   Stopwatch_delete(Q);
+
+  return result;
 }
 
-void kernel_measureMonteCarlo(int itter,
-                              Random R,
-                              double* res,
-                              double* sum_,
-                              double* estimate_time) {
+double kernel_measureMonteCarlo10k(int itter, Random R) {
   double result = 0.0;
-  double sum = 0.0;
   Stopwatch Q = new_Stopwatch();
 
   Stopwatch_start(Q);
-  sum += MonteCarlo_integrate(itter);
+  MonteCarlo_integrate(itter * 10000);
   Stopwatch_stop(Q);
 
   /* approx Mflops */
-  *estimate_time = Stopwatch_read(Q);
-  result = MonteCarlo_num_flops(itter) / *estimate_time * 1.0e-6;
+  result = Stopwatch_read(Q);
   Stopwatch_delete(Q);
-  *res = result;
-  *sum_ = sum;
+  return result;
 }
 
-void kernel_measureSparseMatMult(unsigned int N,
-                                 unsigned int nz,
-                                 int itter,
-                                 Random R,
-                                 double* res,
-                                 double* sum_,
-                                 double* estimate_time) {
+double kernel_measureSparseMatMult(unsigned int N,
+                                   unsigned int nz,
+                                   int itter,
+                                   Random R) {
   /* initialize vector multipliers and storage for result */
   /* y = A*y;  */
 
@@ -117,7 +75,6 @@ void kernel_measureSparseMatMult(unsigned int N,
   double* y = (double*)malloc(sizeof(double) * N);
 
   double result = 0.0;
-  double sum = 0.0;
 
 #if 0
         // initialize square sparse matrix
@@ -177,12 +134,7 @@ void kernel_measureSparseMatMult(unsigned int N,
   Stopwatch_stop(Q);
 
   /* approx Mflops */
-  *estimate_time = Stopwatch_read(Q);
-  result = SparseCompRow_num_flops(N, nz, itter) / *estimate_time * 1.0e-6;
-
-  for (i = 0; i < N; i++)
-    sum += y[i];
-  sum /= N;
+  result = Stopwatch_read(Q);
 
   Stopwatch_delete(Q);
   free(row);
@@ -191,23 +143,16 @@ void kernel_measureSparseMatMult(unsigned int N,
   free(y);
   free(x);
 
-  *res = result;
-  *sum_ = sum;
+  return result;
 }
 
-void kernel_measureLU(unsigned int N,
-                      int itter,
-                      Random R,
-                      double* res,
-                      double* sum_,
-                      double* estimate_time) {
+double kernel_measureLU(unsigned int N, int itter, Random R) {
   double** A = NULL;
   double** lu = NULL;
   int* pivot = NULL;
 
   Stopwatch Q = new_Stopwatch();
   double result = 0.0;
-  double sum = 0.0;
   int i = 0, j = 0;
   int N2 = N / 2;
 
@@ -248,20 +193,13 @@ void kernel_measureLU(unsigned int N,
   Stopwatch_stop(Q);
 
   /* approx Mflops */
-  *estimate_time = Stopwatch_read(Q);
-  result = LU_num_flops(N) * itter / *estimate_time * 1.0e-6;
+  result = Stopwatch_read(Q);
 
   Stopwatch_delete(Q);
   free(pivot);
 
-  for (i = 0; i < N; i++)
-    for (j = 0; j < N; j++)
-      sum += lu[i][j];
-  sum /= (N * N);
-
   Array2D_double_delete(N, N, lu);
   Array2D_double_delete(N, N, A);
 
-  *res = result;
-  *sum_ = sum;
+  return result;
 }
