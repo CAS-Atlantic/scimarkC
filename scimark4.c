@@ -40,17 +40,22 @@ int main(int argc, char* argv[]) {
   /* print out results  */
   printf("FFT reps:              %0.2f\n",
          kernel_measureFFT(FFT_SIZE, itter, R));
+  fflush(stdout);
 
   printf("SOR reps:              %0.2f\n",
          kernel_measureSOR(SOR_SIZE, itter, R));
+  fflush(stdout);
 
   printf("Montel Carlo reps:     %0.2f\n",
          kernel_measureMonteCarlo(itter * MONTECARLO_ITTER, R));
+  fflush(stdout);
 
   printf("Sparse MatMult repss:  %0.2f\n",
          kernel_measureSparseMatMult(SPARSE_SIZE_M, SPARSE_SIZE_nz, itter, R));
+  fflush(stdout);
 
   printf("LU reps:               %0.2f\n", kernel_measureLU(LU_SIZE, itter, R));
+  fflush(stdout);
 
   printf("\n");
 
