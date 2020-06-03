@@ -55,7 +55,7 @@ double kernel_measureMonteCarlo(int itter, Random R) {
   Stopwatch Q = new_Stopwatch();
 
   Stopwatch_start(Q);
-  MonteCarlo_integrate(itter);
+  MonteCarlo_integrate(itter, R);
   Stopwatch_stop(Q);
 
   /* approx Mflops */
