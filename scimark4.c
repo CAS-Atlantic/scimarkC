@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
          kernel_measureSOR(SOR_SIZE, itter, R));
 
   printf("Montel Carlo reps:     %0.2f\n",
-         kernel_measureMonteCarlo10k(itter, R));
+         kernel_measureMonteCarlo(itter * MONTECARLO_ITTER, R));
 
   printf("Sparse MatMult repss:  %0.2f\n",
          kernel_measureSparseMatMult(SPARSE_SIZE_M, SPARSE_SIZE_nz, itter, R));

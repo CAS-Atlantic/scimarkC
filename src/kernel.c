@@ -50,12 +50,12 @@ double kernel_measureSOR(unsigned int N, int itter, Random R) {
   return result;
 }
 
-double kernel_measureMonteCarlo10k(int itter, Random R) {
+double kernel_measureMonteCarlo(int itter, Random R) {
   double result = 0.0;
   Stopwatch Q = new_Stopwatch();
 
   Stopwatch_start(Q);
-  MonteCarlo_integrate(itter * 10000);
+  MonteCarlo_integrate(itter);
   Stopwatch_stop(Q);
 
   /* approx Mflops */

@@ -11,5 +11,6 @@ const unsigned int SOR_SIZE = 1000;    /*  NxN grid  */
 const unsigned int SPARSE_SIZE_M = 100000;
 const unsigned int SPARSE_SIZE_nz = 1000000;
 const unsigned int LU_SIZE = 1000;
+const unsigned int MONTECARLO_ITTER = 1000000;
 
 #endif
