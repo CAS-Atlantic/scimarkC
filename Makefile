@@ -1,7 +1,7 @@
 CC ?= gcc
 SRC := $(wildcard src/*.c)
 CFLAGS := -O3 -fno-unroll-loops -Isrc/include
-BM := FFT SOR LU MonteCarlo SparseMatMult 
+BM := fft sor lu monte_carlo sparse 
 .PHONY: scimark $(BM)
 
 all: $(BM)
