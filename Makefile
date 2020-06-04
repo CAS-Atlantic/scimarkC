@@ -1,9 +1,12 @@
 CC ?= gcc
-SRC := $(wildcard src/*.c) scimark4.c
+SRC := $(wildcard src/*.c)
 CFLAGS := -O3 -fno-unroll-loops -Isrc/include
+BM := FFT SOR LU MonteCarlo SparseMatMult 
+.PHONY: scimark $(BM)
 
-.PHONY: scimark
+all: $(BM)
 
-scimark: 
-	$(CC) $(CFLAGS) -o $@ $(SRC) -lm
+$(BM): $(SRC)
+	mkdir -p bin
+	$(CC) $(CFLAGS) -o bin/$@ $(SRC) src/$@/kernel.c -lm
 

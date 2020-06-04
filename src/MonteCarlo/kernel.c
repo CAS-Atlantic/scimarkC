@@ -1,4 +1,16 @@
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "Random.h"
+#include "Stopwatch.h"
+#include "array.h"
+#include "constants.h"
+
+#include "kernel.h"
+
+static double MonteCarlo_integrate(int Num_samples, Random R);
+static double MonteCarlo_num_flops(int Num_samples);
 
 /**
  Estimate Pi by approximating the area of a circle.
@@ -11,7 +23,7 @@
 
  </pre>
   since the radius is 1.0, we can square both sides
-  and avoid a sqrt() computation:
+  and astatic void a sqrt() computation:
   <pre>
 
     x^2 + y^2 <= 1.0
@@ -29,13 +41,13 @@
 
 */
 
-double MonteCarlo_num_flops(int Num_samples) {
+static double MonteCarlo_num_flops(int Num_samples) {
   /* 3 flops in x^2+y^2 and 1 flop in random routine */
 
   return ((double)Num_samples) * 4.0;
 }
 
-double MonteCarlo_integrate(int Num_samples, Random R) {
+static double MonteCarlo_integrate(int Num_samples, Random R) {
   int under_curve = 0;
   int count;
 
@@ -48,4 +60,23 @@ double MonteCarlo_integrate(int Num_samples, Random R) {
   }
 
   return ((double)under_curve / Num_samples) * 4.0;
+}
+
+static double kernel_measureMonteCarlo(int itter, Random R) {
+  double result = 0.0;
+  Stopwatch Q = new_Stopwatch();
+
+  Stopwatch_start(Q);
+  MonteCarlo_integrate(itter, R);
+  Stopwatch_stop(Q);
+
+  /* approx Mflops */
+  result = Stopwatch_read(Q);
+  Stopwatch_delete(Q);
+  return result;
+}
+
+void kernel_measure(int itter, Random R) {
+  printf("benchmark: Monte Carlo\nitteration: %d\ntime: %0.2fms\n", itter,
+         kernel_measureMonteCarlo(itter * MONTECARLO_ITTER, R));
 }
